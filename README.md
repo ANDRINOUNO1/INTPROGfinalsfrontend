@@ -2,11 +2,9 @@
 
 Angular 10 Boilerplate - Email Sign Up with Verification, Authentication & Forgot Password
 
-# Installation
+# Installationn
 
-# Commands for installation
-
-# For Angular 19:
+# Installation Commands For Angular 19:
 npm install -g @angular/cli
 or
 ng update @angular/core@19 @angular/cli@19  (for major upgrade)
