@@ -1,6 +1,22 @@
-create your own repo pls thanks
-mata-branch check
+# Angular-10-signup-verification-boilerplate
 
-update: eroy-branch added
+Angular 10 Boilerplate - Email Sign Up with Verification, Authentication & Forgot Password
 
-test-push
+# Installation
+
+# Commands for installation
+
+# For Angular 19:
+npm install -g @angular/cli
+or
+ng update @angular/core@19 @angular/cli@19  (for major upgrade)
+
+# For Npm Install
+npm -i --legacy-peer-deps
+
+# Reminder:
+remove the "//" in app.module.ts (// fakeBackendProvider) line 34 - to create fake backend 
+
+
+# To run the server
+type " ng serve "

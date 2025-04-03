@@ -1,15 +1,10 @@
-import {AccoubtService} from '@app/_services';
-import { resolve } from 'path';
+import { AccountService } from '@app/_services';
 
-export function appInitializer(accountService: AccountService){
-    return () => new Promise(resolve =>{
-
-        accountService.refereshToken()
-        .subscribe()
-        .add(resolve);
-        
-        
+export function appInitializer(accountService: AccountService) {
+    return () => new Promise(resolve => {
+        // attempt to refresh token on app start up to auto authenticate
+        accountService.refreshToken()
+            .subscribe()
+            .add(resolve);
     });
 }
-
-// This function is used to initialize the application by refreshing the token before the application starts.

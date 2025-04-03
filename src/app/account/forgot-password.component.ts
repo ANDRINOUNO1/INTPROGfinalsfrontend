@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+﻿import { Component, OnInit } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { first, finalize } from 'rxjs/operators';
 
@@ -24,17 +24,18 @@ export class ForgotPasswordComponent implements OnInit {
 
     // convenience getter for easy access to form fields
     get f() { return this.form.controls; }
+
     onSubmit() {
         this.submitted = true;
-    
+
         // reset alerts on submit
         this.alertService.clear();
-    
+
         // stop here if form is invalid
         if (this.form.invalid) {
             return;
         }
-    
+
         this.loading = true;
         this.alertService.clear();
         this.accountService.forgotPassword(this.f.email.value)
@@ -45,4 +46,4 @@ export class ForgotPasswordComponent implements OnInit {
                 error: error => this.alertService.error(error)
             });
     }
-}    
+}
