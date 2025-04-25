@@ -83,8 +83,7 @@ export class FakeBackendInterceptor implements HttpInterceptor {
                 ...basicDetails(account),
                 jwtToken: generateJwtToken(account)
             });
-        }
-        
+        }     
 
         function refreshToken() {
             const refreshToken = getRefreshToken();
