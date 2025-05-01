@@ -27,6 +27,6 @@ import { HomeComponent } from './home';
         provideHttpClient(withInterceptorsFromDi()),
 
         // provider used to create fake backend
-        fakeBackendProvider
+        // fakeBackendProvider
     ] })
 export class AppModule { }

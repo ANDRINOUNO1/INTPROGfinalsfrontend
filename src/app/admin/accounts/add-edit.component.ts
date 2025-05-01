@@ -34,7 +34,7 @@ export class AddEditComponent implements OnInit {
             firstName: ['', Validators.required],
             lastName: ['', Validators.required],
             email: ['', [Validators.required, Validators.email]],
-            status: ['Active', Validators.required],
+            status: ['', Validators.required],
             role: ['', Validators.required],
             password: ['', [Validators.minLength(6), this.isAddMode ? Validators.required : Validators.nullValidator]],
             confirmPassword: ['']
@@ -80,7 +80,8 @@ export class AddEditComponent implements OnInit {
                     this.router.navigate(['../'], { relativeTo: this.route });
                 },
                 error: error => {
-                    this.alertService.error(error);
+                    const errorMessage = error.message || 'An error occurred while creating the account';
+                    this.alertService.error(errorMessage);
                     this.loading = false;
                 }
             });
@@ -91,11 +92,12 @@ export class AddEditComponent implements OnInit {
             .pipe(first())
             .subscribe({
                 next: () => {
-                    this.alertService.success('Update successful', { keepAfterRouteChange: true });
+                    this.alertService.success('Account updated successfully', { keepAfterRouteChange: true });
                     this.router.navigate(['../../'], { relativeTo: this.route });
                 },
                 error: error => {
-                    this.alertService.error(error);
+                    const errorMessage = error.message || 'An error occurred while updating the account';
+                    this.alertService.error(errorMessage);
                     this.loading = false;
                 }
             });
