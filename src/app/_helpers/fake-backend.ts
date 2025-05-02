@@ -9,6 +9,8 @@ import {
 } from '@angular/common/http';
 import { Observable, of, throwError } from 'rxjs';
 import { delay, materialize, dematerialize } from 'rxjs/operators';
+import { HttpErrorResponse } from '@angular/common/http';
+import { catchError } from 'rxjs/operators';
 
 import { AlertService } from '@app/_services';
 import { Role } from '@app/_models';
@@ -24,8 +26,16 @@ export class FakeBackendInterceptor implements HttpInterceptor {
     intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
         const { url, method, headers, body } = request;
         const alertService = this.alertService;
-
-        return handleRoute();
+    
+        return handleRoute().pipe(
+            catchError((error) => {
+                if (error instanceof HttpErrorResponse && error.status === 400) {
+                    // Show the error alert if status is 400
+                    alertService.error(error.error.message);
+                }
+                return throwError(error);
+            })
+        );
 
         function handleRoute() {
             switch (true) {
@@ -64,15 +74,21 @@ export class FakeBackendInterceptor implements HttpInterceptor {
 
         function authenticate() {
             const { email, password } = body;
-            const account = accounts.find(x => x.email === email && x.password === password);
+            const account = accounts.find(x => x.email === email);
         
-            if (!account) return error('Email or password is incorrect');
+            if (!account) {
+                return error('Invalid email.'); 
+            }
+        
+            if (account.password !== password) {
+                return error('Password is incorrect'); 
+            }
         
             if (!account.isVerified) {
                 return error('Email is not verified. Please check your inbox to verify.');
             }
         
-            if (account.status == 'InActive') {
+            if (account.status !== 'Active') {
                 return error('Account is InActive. Please contact system administrator!');
             }
         
@@ -84,6 +100,7 @@ export class FakeBackendInterceptor implements HttpInterceptor {
                 jwtToken: generateJwtToken(account)
             });
         }
+        
         
 
         function refreshToken() {
@@ -276,9 +293,20 @@ export class FakeBackendInterceptor implements HttpInterceptor {
             return of(new HttpResponse({ status: 200, body })).pipe(delay(500));
         }
 
-        function error(message) {
-            return throwError(() => ({ error: { message } })).pipe(materialize(), delay(500), dematerialize());
+        function error(message: string) {
+            setTimeout(() => alertService.error(message, { autoClose: true }), 100);
+
+        
+            // Return the error
+            return throwError(() =>
+                new HttpErrorResponse({
+                    status: 400,
+                    statusText: 'Bad Request',
+                    error: { message }
+                })
+            ).pipe(materialize(), delay(500), dematerialize());
         }
+        
 
         function unauthorized() {
             return throwError(() => ({ status: 401, error: { message: 'Unauthorized' } })).pipe(materialize(), delay(500), dematerialize());
