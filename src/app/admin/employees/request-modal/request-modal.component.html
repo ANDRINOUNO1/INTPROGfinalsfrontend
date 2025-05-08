@@ -1,0 +1,38 @@
+<h2 mat-dialog-title>{{ data?.id ? 'Edit' : 'Add' }} Request</h2>
+<form [formGroup]="form" (ngSubmit)="save()" mat-dialog-content>
+  <mat-form-field class="full-width">
+    <input matInput placeholder="Employee ID" formControlName="employeeId">
+  </mat-form-field>
+
+  <mat-form-field class="full-width">
+    <mat-select formControlName="status">
+      <mat-option value="pending">Pending</mat-option>
+      <mat-option value="approved">Approved</mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field class="full-width">
+    <textarea matInput placeholder="Description" formControlName="description"></textarea>
+  </mat-form-field>
+
+  <div formArrayName="items" *ngFor="let item of items.controls; let i=index">
+    <div [formGroupName]="i" class="item-group">
+      <mat-form-field>
+        <input matInput placeholder="Item Name" formControlName="itemName">
+      </mat-form-field>
+      <mat-form-field>
+        <input matInput type="number" placeholder="Quantity" formControlName="quantity">
+      </mat-form-field>
+      <button mat-icon-button color="warn" (click)="removeItem(i)" *ngIf="items.length > 1">
+        <mat-icon>delete</mat-icon>
+      </button>
+    </div>
+  </div>
+
+  <button mat-button type="button" (click)="addItem()">Add Item</button>
+</form>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="close()">Cancel</button>
+  <button mat-button color="primary" [disabled]="form.invalid" (click)="save()">Save</button>
+</mat-dialog-actions>
