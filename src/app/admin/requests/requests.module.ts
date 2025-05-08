@@ -1,19 +1,23 @@
 import { NgModule } from '@angular/core';
-import { ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { RequestsRoutingModule } from './requests-routing.module';
-import { ListComponent } from './list.component';
+import { FormsModule } from '@angular/forms';
+import { ReactiveFormsModule } from '@angular/forms';
 
+import { RequestListComponent } from './list.component';
+import { AddEditRequestComponent } from './add-edit.component';
+import { RequestsRoutingModule } from './requests-routing.module';
 
 @NgModule({
+    declarations: [
+        RequestListComponent,
+        AddEditRequestComponent
+    ],
     imports: [
         CommonModule,
+        FormsModule,
         ReactiveFormsModule,
-        RequestsRoutingModule
-    ],
-    declarations: [
-        ListComponent
+        RequestsRoutingModule,
+        
     ]
 })
 export class RequestsModule { }
-
