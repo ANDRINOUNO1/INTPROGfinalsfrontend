@@ -1,0 +1,41 @@
+<div class="card">
+    <div class="card-header">Employees</div>\
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-stripped">
+
+                <thead>
+                    <tr>
+                        <th>Empolyee ID</th>
+                        <th>User</th>
+                        <th>Position</th>
+                        <th>Department</th>
+                        <th>Hire Date</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let empolyee of employees" ></tr>
+                    <td>{{empolyee.empolyeeld}}</td>
+                    <td>{{empolyee.user?.email}}</td>
+                    <td>{{empolyee.position}}</td>
+                    <td>{{empolyee.deaparment>.name}}</td>
+                    <td>{{empolyee.hireDate | date:"shortDate"}}</td>
+                    <td><span class="badge" [ngClass]="{'bg-success': empolyee.status === 'Active', 'bg-danger': employee.status !== 'Active'}">{{empolyee.status}}</span> </td>
+                   
+                         <td>
+                        <button class="btn btn-sm btn-info me-1" (click)="viewRequests(employee.id)">Requests</button>
+                        <button class="btn btn-sm btn-info me-1" (click)="viewWorkflows(employee.id)">Workflows</button>
+                        <button *ngIf="account()?.role === 'Admin'" class="btn btn-sm btn-warning me-1" (click)="transfer(employee)">Transfer</button>
+                        <button class="btn btn-sm btn-primary me-1" (click)="edit(employee.id)">Edit</button>
+                        <button *ngIf="account()?.role === 'Admin'" class="btn btn-sm btn-danger" (click)="delete(employee.id)">Delete</button>
+                    </td>
+                    </tr>
+                </tbody>
+             </table>
+          </div>
+      <button *ngIf="account()?.role === 'Admin'" class="btn btn-primary float-end" (click)="add()">Add Employee</button>
+     </div>
+ </div>
+    
