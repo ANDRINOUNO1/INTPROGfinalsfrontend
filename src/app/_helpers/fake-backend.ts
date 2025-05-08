@@ -11,9 +11,11 @@ import { Observable, of, throwError } from 'rxjs';
 import { delay, materialize, dematerialize } from 'rxjs/operators';
 import { HttpErrorResponse } from '@angular/common/http';
 import { catchError } from 'rxjs/operators';
+import { mergeMap } from 'rxjs/operators';
 
 import { AlertService } from '@app/_services';
 import { Role } from '@app/_models';
+
 
 const accountsKey = 'angular-10-signup-verification-boilerplate-accounts';
 localStorage.removeItem(accountsKey);
@@ -21,7 +23,28 @@ let accounts: any[] = [];
 
 @Injectable()
 export class FakeBackendInterceptor implements HttpInterceptor {
-    constructor(private alertService: AlertService) {}
+    users: any;
+    constructor(private alertService: AlertService) {
+        // Removed invalid binding of this.employees
+    }
+
+    public employees = [
+        { id: 1, employeeId: 'EMP001', userId: 1, position: 'Developer', departmentId: 1, hireDate: '2025-01-01', status: 'Active' },
+        { id: 2, employeeId: 'EMP002', userId: 2, position: 'Designer', departmentId: 2, hireDate: '2025-02-01', status: 'Active' }
+    ];
+
+    public departments = [
+        { id: 1, name: 'Engineering', description: 'Software development team', employeeCount: 1 },
+        { id: 2, name: 'Marketing', description: 'Marketing team', employeeCount: 1 }
+    ];
+
+    public workflows = [
+        { id: 1, employeeId: 1, type: 'Onboarding', details: { task: 'Setup workstation' }, status: 'Pending' }
+    ];
+
+    public requests = [
+        { id: 1, employeeId: 2, type: 'Equipment', requestItems: [{ name: 'Laptop', quantity: 1 }], status: 'Pending' }
+    ];
 
     intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
         const { url, method, headers, body } = request;
@@ -65,9 +88,66 @@ export class FakeBackendInterceptor implements HttpInterceptor {
                     return updateAccount();
                 case url.match(/\/accounts\/\d+$/) && method === 'DELETE':
                     return deleteAccount();
-                default:
-                    return next.handle(request);
-            }
+                // Employees Routes
+                case url.endsWith('/employees') && method === 'GET':
+                    return getEmployees(headers);
+
+                case url.endsWith('/employees') && method === 'POST':
+                    return createEmployee(body, headers);
+
+                case url.match(/\/employees\/\d+$/) && method === 'GET':
+                    return getEmployeeById(url, headers);
+
+                case url.match(/\/employees\/\d+$/) && method === 'PUT':
+                    return updateEmployee(url, body, headers);
+
+                case url.match(/\/employees\/\d+$/) && method === 'DELETE':
+                    return deleteEmployee(url, headers);
+
+                case url.match(/\/employees\/\d+\/transfer$/) && method === 'POST':
+                    return transferEmployee(url, body);
+
+                // Departments Routes
+                case url.endsWith('/departments') && method === 'GET':
+                    return getDepartments(headers);
+
+                case url.endsWith('/departments') && method === 'POST':
+                    return createDepartment(body, headers);
+
+                case url.match(/\/departments\/\d+$/) && method === 'PUT':
+                    return updateDepartment(url, body, headers);
+
+                case url.match(/\/departments\/\d+$/) && method === 'DELETE':
+                    return deleteDepartment(url, headers);
+
+                // Workflows Routes
+                case url.match(/\/workflows\/employee\/\d+$/) && method === 'GET':
+                    return getWorkflowsByEmployeeId(url, headers);
+
+                case url.endsWith('/workflows') && method === 'GET':
+                    return getWorkflows(headers);
+
+                case url.endsWith('/workflows') && method === 'POST':
+                    return createWorkflow(body, headers);
+
+                case url.match(/\/workflows\/\d+$/) && method === 'DELETE':
+                    return deleteWorkflow(url, headers);
+
+                // Requests Routes
+                case url.endsWith('/requests') && method === 'GET':
+                    return getRequests(headers);
+
+                case url.endsWith('/requests') && method === 'POST':
+                    return createRequest(body, headers);
+
+                case url.match(/\/requests\/\d+$/) && method === 'PUT':
+                    return updateRequest(url, body, headers);
+
+                case url.match(/\/requests\/\d+$/) && method === 'DELETE':
+                    return deleteRequest(url, headers);
+                        default:
+                            return next.handle(request);
+                    }
         }
 
         // ===== ROUTE FUNCTIONS =====
@@ -294,20 +374,17 @@ export class FakeBackendInterceptor implements HttpInterceptor {
         }
 
         function error(message: string) {
-            setTimeout(() => alertService.error(message, { autoClose: true }), 100);
-
-        
-            // Return the error
-            return throwError(() =>
-                new HttpErrorResponse({
-                    status: 400,
-                    statusText: 'Bad Request',
-                    error: { message }
-                })
-            ).pipe(materialize(), delay(500), dematerialize());
+            return throwError(() => new HttpErrorResponse({ status: 400, error: { message } })).pipe(delay(500));
         }
-        
 
+        function idFromUrl() {
+            const urlParts = url.split('/');
+            return parseInt(urlParts[urlParts.length - 1]);
+        }
+
+        function newId(collection: any[]): number {
+            return collection.length ? Math.max(...collection.map(x => x.id)) + 1 : 1;
+        }
         function unauthorized() {
             return throwError(() => ({ status: 401, error: { message: 'Unauthorized' } })).pipe(materialize(), delay(500), dematerialize());
         }
@@ -317,6 +394,27 @@ export class FakeBackendInterceptor implements HttpInterceptor {
             return { id, title, firstName, lastName, email, status, role, dateCreated, isVerified };
         }
 
+        function basicEmployeeDetails(employee) {
+            const { id, employeeId, userId, position, departmentId, hireDate, status } = employee;
+            return { id, employeeId, userId, position, departmentId, hireDate, status };
+        }
+
+        function basicDepartmentDetails(department) {
+            const { id, name, description, employeeCount } = department;
+            return { id, name, description, employeeCount };
+        }
+        
+        function basicWorkflowDetails(workflow) {
+            const { id, employeeId, type, details, status } = workflow;
+            return { id, employeeId, type, details, status };
+        }
+        
+        function basicRequestDetails(request) {
+            const { id, employeeId, type, requestItems, status } = request;
+            return { id, employeeId, type, requestItems, status };
+        }
+        
+
         function isAuthenticated() {
             return !!currentAccount();
         }
@@ -324,11 +422,6 @@ export class FakeBackendInterceptor implements HttpInterceptor {
         function isAuthorized(role) {
             const account = currentAccount();
             return account && account.role === role;
-        }
-
-        function idFromUrl() {
-            const urlParts = url.split('/');
-            return parseInt(urlParts[urlParts.length - 1]);
         }
 
         function newAccountId() {
@@ -363,6 +456,159 @@ export class FakeBackendInterceptor implements HttpInterceptor {
 
         function getRefreshToken() {
             return (document.cookie.split(';').find(x => x.includes('fakeRefreshToken')) || '=').split('=')[1];
+        }
+        
+        // Employee Handlers
+        function getEmployees(headers: any) {
+            return this.authorize(headers, null, () => {
+                const employeesWithDetails = this.employees.map(employee => ({
+                    ...employee,
+                    user: this.users.find(u => u.id === employee.userId), // Add user details
+                    department: this.departments.find(d => d.id === employee.departmentId) // Add department details
+                }));
+                return ok(employeesWithDetails);
+            });
+        }
+
+        function createEmployee(body: any, headers: any) {
+            return this.authorize(headers, 'Admin', () => {
+                const employee = { id: newId(this.employees), ...body };
+                this.employees.push(employee);
+                return ok(employee);
+            });
+        }
+
+        function getEmployeeById(url: string, headers: any) {
+            return this.authorize(headers, null, () => {
+                const employee = this.employees.find(e => e.id === idFromUrl());
+                return employee ? ok(basicEmployeeDetails(employee)) : error('Employee not found');
+            });
+        }
+
+        function updateEmployee(url: string, body: any, headers: any) {
+            return this.authorize(headers, 'Admin', () => {
+                const employee = this.employees.find(e => e.id === idFromUrl());
+                if (!employee) return error('Employee not found');
+                Object.assign(employee, body);
+                return ok(basicEmployeeDetails(employee));
+            });
+        }
+
+        function deleteEmployee(url: string, headers: any) {
+            return this.authorize(headers, 'Admin', () => {
+                this.employees = this.employees.filter(e => e.id !== idFromUrl());
+                return ok({ message: 'Employee deleted' });
+            });
+        }
+
+        function transferEmployee(url: string, body: any) {
+            const transferId = idFromUrl();
+            const transferBody = body;
+            const employeeToTransfer = this.employees.find(e => e.id === transferId);
+            if (employeeToTransfer) {
+                employeeToTransfer.departmentId = transferBody.departmentId;
+                return of(new HttpResponse({ status: 200, body: { message: 'Employee transferred successfully' } }));
+            } else {
+                return throwError(() => new Error('Employee not found'));
+            }
+        }
+        
+        // Department Handlers
+        function getDepartments(headers: any) {
+            return this.authorize(headers, null, () => ok(this.departments.map(basicDepartmentDetails)));
+        }
+        
+        function createDepartment(body: any, headers: any) {
+            return this.authorize(headers, 'Admin', () => {
+                const department = { id: newId(this.departments), ...body, employeeCount: 0 };
+                this.departments.push(department);
+                return ok(department);
+            });
+        }
+        
+        function updateDepartment(url: string, body: any, headers: any) {
+            return this.authorize(headers, 'Admin', () => {
+                const department = this.departments.find(d => d.id === idFromUrl());
+                if (!department) return error('Department not found');
+                Object.assign(department, body);
+                return ok(basicDepartmentDetails(department));
+            });
+        }
+        
+        function deleteDepartment(url: string, headers: any) {
+            return this.authorize(headers, 'Admin', () => {
+                this.departments = this.departments.filter(d => d.id !== idFromUrl());
+                return ok({ message: 'Department deleted' });
+            });
+        }
+        
+        // Workflow Handlers
+        function getWorkflows(headers: any) {
+            return this.authorize(headers, null, () => {
+                const workflowsWithDetails = this.workflows.map(workflow => ({
+                    ...workflow,
+                    employee: this.employees.find(e => e.id === workflow.employeeId) // Add employee details
+                }));
+                return ok(workflowsWithDetails);
+            });
+        }
+
+        function createWorkflow(body: any, headers: any) {
+            return this.authorize(headers, 'Admin', () => {
+                const workflow = { id: newId(this.workflows), ...body };
+                this.workflows.push(workflow);
+                return ok(workflow);
+            });
+        }
+
+        function deleteWorkflow(url: string, headers: any) {
+            return this.authorize(headers, 'Admin', () => {
+                this.workflows = this.workflows.filter(w => w.id !== idFromUrl());
+                return ok({ message: 'Workflow deleted' });
+            });
+        }
+
+        function getWorkflowsByEmployeeId(url: string, headers: any) {
+            return this.authorize(headers, null, () => {
+                const employeeId = idFromUrl();
+                const workflows = this.workflows.filter(w => w.employeeId === employeeId).map(basicWorkflowDetails);
+                return ok(workflows);
+            });
+        }
+
+        // Request Handlers
+        function getRequests(headers: any) {
+            return this.authorize(headers, null, () => {
+                const requestsWithDetails = this.requests.map(request => ({
+                    ...request,
+                    employee: this.employees.find(e => e.id === request.employeeId) // Add employee details
+                }));
+                return ok(requestsWithDetails);
+            });
+        }
+
+        function createRequest(body: any, headers: any) {
+            return this.authorize(headers, null, () => {
+                const request = { id: newId(this.requests), ...body };
+                this.requests.push(request);
+                return ok(request);
+            });
+        }
+
+        function updateRequest(url: string, body: any, headers: any) {
+            return this.authorize(headers, 'Admin', () => {
+                const request = this.requests.find(r => r.id === idFromUrl());
+                if (!request) return error('Request not found');
+                Object.assign(request, body);
+                return ok(basicRequestDetails(request));
+            });
+        }
+
+        function deleteRequest(url: string, headers: any) {
+            return this.authorize(headers, 'Admin', () => {
+                this.requests = this.requests.filter(r => r.id !== idFromUrl());
+                return ok({ message: 'Request deleted' });
+            });
         }
     }
 }

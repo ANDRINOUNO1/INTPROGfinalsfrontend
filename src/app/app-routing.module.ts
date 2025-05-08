@@ -5,17 +5,17 @@ import { HomeComponent } from './home';
 import { AuthGuard } from './_helpers';
 import { Role } from './_models';
 
-const accountModule = () => import('./account/account.module').then(x => x.AccountModule);
-const adminModule = () => import('./admin/admin.module').then(x => x.AdminModule);
-const profileModule = () => import('./profile/profile.module').then(x => x.ProfileModule);
 
 const routes: Routes = [
     { path: '', component: HomeComponent, canActivate: [AuthGuard] },
-    { path: 'account', loadChildren: accountModule },
-    { path: 'profile', loadChildren: profileModule, canActivate: [AuthGuard] },
-    { path: 'admin', loadChildren: adminModule, canActivate: [AuthGuard], data: { roles: [Role.Admin] } },
-
-    // otherwise redirect to home
+    { path: 'account', loadChildren: () => import('./account/account.module').then(x => x.AccountModule) },
+    { path: 'profile', loadChildren: () => import('./profile/profile.module').then(x => x.ProfileModule), canActivate: [AuthGuard] },
+    { path: 'admin', loadChildren: () => import('./admin/admin.module').then(x => x.AdminModule), canActivate: [AuthGuard], data: { roles: [Role.Admin] } },
+    { path: 'departments', loadChildren: () => import('./departments/department.module').then(m => m.DepartmentModule) },
+    { path: 'employees', loadChildren: () => import('./employees/employee.module').then(m => m.EmployeeModule) },
+    { path: 'requests', loadChildren: () => import('./requests/request.module').then(m => m.RequestsModule) },
+    { path: 'workflows', loadChildren: () => import('./workflows/workflow.module').then(m => m.WorkflowModule) },  
+    // Otherwise redirect to home
     { path: '**', redirectTo: '' }
 ];
 
