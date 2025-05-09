@@ -18,9 +18,7 @@
                         <td>{{request.employee?.employeeId}}</td>
                         <td>
                             <ul>
-                                <li *ngFor="let item of request.requestItems">
-                                    {{item.name}} (x{{item.quantity}})
-                                </li>
+                                <li *ngFor="let item of request.requestItems">{{item.name}} (x{{item.quantity}})</li>
                             </ul>
                         </td>
                         <td>{{request.status}}</td>
