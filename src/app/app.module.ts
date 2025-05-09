@@ -13,7 +13,6 @@ import { AppComponent } from './app.component';
 import { AlertComponent } from './_components';
 import { HomeComponent } from './home';
 
-
 @NgModule({
     declarations: [
         AppComponent,
@@ -33,7 +32,7 @@ import { HomeComponent } from './home';
         provideHttpClient(withInterceptorsFromDi()),
 
         // provider used to create fake backend
-        fakeBackendProvider
+        //fakeBackendProvider
     ],
     bootstrap: [AppComponent]
 })

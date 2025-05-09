@@ -1,19 +1,13 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-
-export interface Department {
-    id: number;
-    name: string;
-    description: string;
-    employeeCount: number;
-}
+import { Department } from './department';
 
 @Injectable({
     providedIn: 'root'
 })
 export class DepartmentService {
-    private baseUrl = '/departments'; // Base URL for the fake backend
+    private baseUrl = 'http://localhost:4000/departments';
 
     constructor(private http: HttpClient) {}
 
@@ -29,7 +23,12 @@ export class DepartmentService {
 
     // Create a new department
     createDepartment(department: Partial<Department>): Observable<Department> {
-        return this.http.post<Department>(this.baseUrl, department);
+        // Only send name and description
+        const payload = {
+            name: department.name,
+            description: department.description
+        };
+        return this.http.post<Department>(this.baseUrl, payload);
     }
 
     // Update an existing department

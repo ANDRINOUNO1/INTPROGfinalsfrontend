@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { EmployeeService, Employee } from './employee.service';
-import { DepartmentService, Department } from '../departments/department.service';
+import { EmployeeService } from './employee.service';
+import { Employee } from './employee';
+import { DepartmentService } from '../departments/department.service';
+import { Department } from '../departments/department';
 
 @Component({
     selector: 'app-add-edit-employee',

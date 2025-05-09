@@ -1,22 +1,13 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-
-export interface Employee {
-    id: number;
-    employeeId: string;
-    userId: number;
-    position: string;
-    departmentId: number;
-    hireDate: string;
-    status: string;
-}
+import { Employee } from './employee';
 
 @Injectable({
     providedIn: 'root'
 })
 export class EmployeeService {
-    private baseUrl = '/employees'; // Base URL for the fake backend
+    private baseUrl = 'http://localhost:4000/employees';
 
     constructor(private http: HttpClient) {}
 

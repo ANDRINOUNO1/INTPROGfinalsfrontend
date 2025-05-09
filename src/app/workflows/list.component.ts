@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { WorkflowService, Workflow } from './workflow.service';
+import { ActivatedRoute, Router } from '@angular/router';
+import { WorkflowService } from './workflow.service';
+import { Workflow } from './workflow';
 
 @Component({
     selector: 'app-workflow-list',

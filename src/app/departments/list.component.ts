@@ -1,6 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { DepartmentService, Department } from './department.service';
+import { DepartmentService } from './department.service';
+import { Department } from './department';
+import { EmployeeService } from '../employees/employee.service';
+import { Employee } from '../employees/employee';
 
 @Component({
     selector: 'app-department-list',
@@ -9,15 +12,18 @@ import { DepartmentService, Department } from './department.service';
 })
 export class DepartmentListComponent implements OnInit {
     departments: Department[] = [];
+    employees: Employee[] = [];
     errorMessage: string = '';
 
     constructor(
         private departmentService: DepartmentService,
-        private router: Router
+        private router: Router,
+        private employeeService: EmployeeService
     ) {}
 
     ngOnInit(): void {
         this.loadDepartments();
+        this.loadEmployees();
     }
 
     // Load all departments
@@ -25,6 +31,13 @@ export class DepartmentListComponent implements OnInit {
         this.departmentService.getDepartments().subscribe({
             next: (data) => (this.departments = data),
             error: (err) => (this.errorMessage = 'Failed to load departments')
+        });
+    }
+
+    loadEmployees(): void {
+        this.employeeService.getEmployees().subscribe({
+            next: (data) => (this.employees = data),
+            error: (err) => (this.errorMessage = 'Failed to load employees')
         });
     }
 
@@ -55,5 +68,10 @@ export class DepartmentListComponent implements OnInit {
     account(): { role: string } | null {
         // Simulate fetching the current user's account details
         return { role: 'Admin' }; // Replace with actual logic if needed
+    }
+
+    // Get the count of employees in a department
+    getEmployeeCount(departmentId: number): number {
+        return this.employees.filter(e => e.departmentId === departmentId).length;
     }
 }

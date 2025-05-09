@@ -7,7 +7,8 @@ import { AddEditRequestComponent } from './add-edit.component';
 const routes: Routes = [
     { path: '', component: RequestListComponent },
     { path: 'add', component: AddEditRequestComponent },
-    { path: 'edit/:id', component: AddEditRequestComponent }
+    { path: 'edit/:id', component: AddEditRequestComponent },
+    { path: 'employee/:id', component: RequestListComponent }
 ];
 
 @NgModule({

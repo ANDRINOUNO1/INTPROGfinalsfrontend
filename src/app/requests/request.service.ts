@@ -1,25 +1,13 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-
-export interface RequestItem {
-    name: string;
-    quantity: number;
-}
-
-export interface Request {
-    id: number;
-    employeeId: number;
-    type: string;
-    items: RequestItem[];
-    status: string;
-}
+import { Request, RequestItem } from './request';
 
 @Injectable({
     providedIn: 'root'
 })
 export class RequestService {
-    private baseUrl = '/requests'; // Base URL for the fake backend
+    private baseUrl = 'http://localhost:4000/requests';
 
     constructor(private http: HttpClient) {}
 
@@ -46,5 +34,10 @@ export class RequestService {
     // Delete a request
     deleteRequest(id: number): Observable<{ message: string }> {
         return this.http.delete<{ message: string }>(`${this.baseUrl}/${id}`);
+    }
+
+    // Get requests by employee ID
+    getRequestsByEmployeeId(employeeId: number): Observable<Request[]> {
+        return this.http.get<Request[]>(`${this.baseUrl}?employeeId=${employeeId}`);
     }
 }

@@ -1,5 +1,8 @@
 <div class="card">
-    <div class="card-header">Employees</div>
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span>Employees</span>
+        <button class="btn btn-primary btn-sm" (click)="addEmployee()">Add Employee</button>
+    </div>
     <div class="card-body">
         <div class="table-responsive">
             <table class="table table-striped">
@@ -21,11 +24,14 @@
                         <td>{{ employee.employeeId }}</td>
                         <td>{{ employee.user?.email }}</td>
                         <td>{{ employee.position }}</td>
-                        <td>{{ employee.department?.name }}</td>
+                        <td>
+                            {{ employee.department?.name }}
+                            <span *ngIf="employee.departmentId">({{ getDepartmentEmployeeCount(employee.departmentId) }})</span>
+                        </td>
                         <td>{{ employee.hireDate | date: 'shortDate' }}</td>
                         <td>
-                            <span class="badge" [ngClass]="{'bg-success': employee.status === 'Active', 'bg-danger': employee.status !== 'Active'}">
-                                {{ employee.status }}
+                            <span class="badge" [ngClass]="{'bg-success': getAccountStatus(employee.userId) === 'Active', 'bg-danger': getAccountStatus(employee.userId) !== 'Active'}">
+                                {{ getAccountStatus(employee.userId) === 'Active' ? 'Active' : 'Inactive' }}
                             </span>
                         </td>
                         <td>
@@ -40,4 +46,45 @@
             </table>
         </div>
     </div>
+</div>
+
+<!-- Transfer Modal -->
+<div class="modal" tabindex="-1" [ngClass]="{ 'show d-block': showTransferModal }" *ngIf="showTransferModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Transfer Employee</h5>
+        <button type="button" class="btn-close" (click)="cancelTransfer()"></button>
+      </div>
+      <div class="modal-body">
+        <p>Select a department to transfer <strong>{{ selectedEmployee?.employeeId }}</strong>:</p>
+        <select class="form-select" [(ngModel)]="selectedDepartmentId">
+          <option *ngFor="let dept of departments" [value]="dept.id">{{ dept.name }}</option>
+        </select>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="cancelTransfer()">Cancel</button>
+        <button type="button" class="btn btn-primary" (click)="confirmTransfer()">Transfer</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal" tabindex="-1" [ngClass]="{ 'show d-block': showDeleteModal }" *ngIf="showDeleteModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Confirm Delete</h5>
+        <button type="button" class="btn-close" (click)="cancelDelete()"></button>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to delete employee <strong>{{ selectedEmployee?.employeeId }}</strong>?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="cancelDelete()">Cancel</button>
+        <button type="button" class="btn btn-danger" (click)="confirmDelete()">Delete</button>
+      </div>
+    </div>
+  </div>
 </div>

@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
-import { RequestService, Request } from './request.service';
+import { Router, ActivatedRoute } from '@angular/router';
+import { RequestService } from './request.service';
+import { Request } from './request';
 
 @Component({
     selector: 'app-request-list',
@@ -10,22 +11,32 @@ import { RequestService, Request } from './request.service';
 export class RequestListComponent implements OnInit {
     requests: Request[] = [];
     errorMessage: string = '';
+    employeeId?: number;
 
     constructor(
         private requestService: RequestService,
-        private router: Router
+        private router: Router,
+        private route: ActivatedRoute
     ) {}
 
     ngOnInit(): void {
+        this.employeeId = this.route.snapshot.params['id'];
         this.loadRequests();
     }
 
-    // Load all requests
+    // Load all requests or requests for a specific employee
     loadRequests(): void {
-        this.requestService.getRequests().subscribe({
-            next: (data) => (this.requests = data),
-            error: (err) => (this.errorMessage = 'Failed to load requests')
-        });
+        if (this.employeeId) {
+            this.requestService.getRequestsByEmployeeId(this.employeeId).subscribe({
+                next: (data) => (this.requests = data),
+                error: (err) => (this.errorMessage = 'Failed to load requests')
+            });
+        } else {
+            this.requestService.getRequests().subscribe({
+                next: (data) => (this.requests = data),
+                error: (err) => (this.errorMessage = 'Failed to load requests')
+            });
+        }
     }
 
     // Navigate to the add request page

@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { DepartmentService, Department } from './department.service';
+import { DepartmentService } from './department.service';
+import { Department } from './department';
 
 @Component({
     selector: 'app-add-edit-department',
